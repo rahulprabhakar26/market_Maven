@@ -58,4 +58,11 @@ public class PortfolioTrade {
   }
   //solution
 
+  @Override
+  public String toString() {
+    return "PortfolioTrade [purchaseDate=" + purchaseDate + ", quantity=" + quantity + ", symbol="
+        + symbol + ", tradeType=" + tradeType + "]";
+  }
+
+
 }
