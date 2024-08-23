@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -30,7 +31,7 @@ import org.springframework.web.client.RestTemplate;
 
 public class PortfolioManagerApplication {
 
- static String token = "1106a1a3940ab609f2cac6fc9630caee9c6dfc58";
+ 
 
   // TODO: CRIO_TASK_MODULE_JSON_PARSING
   //  Task:
@@ -158,7 +159,7 @@ public class PortfolioManagerApplication {
 
     //Extracting candles & extracting dto based on closing price.
     for (PortfolioTrade ptrade : trades) {
-      String url = prepareUrl(ptrade, LocalDate.parse(args[1]), token);
+      String url = prepareUrl(ptrade, LocalDate.parse(args[1]), getToken());
       TiingoCandle[] candels =restTemplate.getForObject(url, TiingoCandle[].class);
       dtos.add(new TotalReturnsDto(ptrade.getSymbol(), candels[candels.length-1].getClose()));
     }
@@ -269,6 +270,7 @@ public class PortfolioManagerApplication {
 
 
   public static String getToken() {
+     String token = "1106a1a3940ab609f2cac6fc9630caee9c6dfc58";
     return token;
 }
 
@@ -288,13 +290,28 @@ public class PortfolioManagerApplication {
        LocalDate endDate = LocalDate.parse(args[1]);
        String contents = readFileAsString(file);
        ObjectMapper objectMapper = getObjectMapper();
-       return portfolioManager.calculateAnnualizedReturn(Arrays.asList(portfolioTrades), endDate);
+       
+       //use object mapper to map contents to array of Portfoliotrade
+       PortfolioTrade [] portfolioTrades = objectMapper.readValue(contents, PortfolioTrade[].class);
+
+
+
+      PortfolioManager portfolioManager=PortfolioManagerFactory.getPortfolioManager(new RestTemplate());
+      return portfolioManager.calculateAnnualizedReturn(Arrays.asList(portfolioTrades), endDate);
+  }
+
+
+  private static String readFileAsString(String file) throws URISyntaxException, IOException {
+    File loadedFile = resolveFileFromResources(file);
+    Path path = loadedFile.toPath();
+    return Files.readString(path);  
   }
 
 
   public static void main(String[] args) throws Exception {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
+
 
     printJsonObject(mainReadFile(args));
 

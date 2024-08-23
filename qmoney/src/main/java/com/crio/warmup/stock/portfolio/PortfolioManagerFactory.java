@@ -10,10 +10,10 @@ public class PortfolioManagerFactory {
   //  Remember, pass along the RestTemplate argument that is provided to the new instance.
 
   public static PortfolioManager getPortfolioManager(RestTemplate restTemplate) {
-
-     return null;
+    PortfolioManager pm;
+    pm=new PortfolioManagerImpl(restTemplate);
+     return pm;
   }
-
 
 
 

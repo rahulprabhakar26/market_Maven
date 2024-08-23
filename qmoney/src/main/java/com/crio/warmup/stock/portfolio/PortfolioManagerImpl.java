@@ -3,7 +3,7 @@ package com.crio.warmup.stock.portfolio;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
-
+import com.crio.warmup.stock.PortfolioManagerApplication;
 import com.crio.warmup.stock.dto.AnnualizedReturn;
 import com.crio.warmup.stock.dto.Candle;
 import com.crio.warmup.stock.dto.PortfolioTrade;
@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -27,9 +29,7 @@ import org.springframework.web.client.RestTemplate;
 
 public class PortfolioManagerImpl implements PortfolioManager {
 
-
-
-
+ private RestTemplate restTemplate ;
   // Caution: Do not delete or modify the constructor, or else your build will break!
   // This is absolutely necessary for backward compatibility
   protected PortfolioManagerImpl(RestTemplate restTemplate) {
@@ -66,11 +66,41 @@ public class PortfolioManagerImpl implements PortfolioManager {
 
   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
       throws JsonProcessingException {
-     return null;
+      String url= buildUri(symbol, from, to);
+     return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+    
   }
 
   protected String buildUri(String symbol, LocalDate startDate, LocalDate endDate) {
-       String uriTemplate = "https:api.tiingo.com/tiingo/daily/$SYMBOL/prices?"
-            + "startDate=$STARTDATE&endDate=$ENDDATE&token=$APIKEY";
+     String uriTemplate = "https:api.tiingo.com/tiingo/daily/"+symbol+"/prices?"
+            + "startDate="+startDate+"&endDate="+endDate+"&token="+PortfolioManagerApplication.getToken();
+            return uriTemplate;
+  }
+  
+
+
+  @Override
+  public List<AnnualizedReturn> calculateAnnualizedReturn(List<PortfolioTrade> portfolioTrades,
+      LocalDate endDate) throws JsonProcessingException {
+
+           List<AnnualizedReturn>annualizedReturns = new ArrayList <AnnualizedReturn>() ;
+
+        for(PortfolioTrade  portfolioTrade : portfolioTrades)
+        {    
+               // Fetch the list of candles for the given trade and end date
+        List<Candle> result = getStockQuote(portfolioTrade.getSymbol(),portfolioTrade.getPurchaseDate(), endDate);
+
+        // Calculate the buy price and sell price
+        double buyPrice = result.get(0).getOpen();
+        double sellPrice = result.get(result.size() - 1).getClose();
+        // Calculate the annualized return for this trade
+        AnnualizedReturn annualizedReturn = PortfolioManagerApplication.calculateAnnualizedReturns(endDate, portfolioTrade, buyPrice, sellPrice);
+        
+        // Add the calculated return to the list
+        annualizedReturns.add(annualizedReturn);
+            
+        }
+     Collections.sort(annualizedReturns, getComparator());
+    return annualizedReturns;
   }
 }
