@@ -15,6 +15,11 @@ public class PortfolioManagerFactory {
      return pm;
   }
 
+  // public static PortfolioManager getPortfolioManager(RestTemplate restTemplate) {
+
+  // }
+
+
 
 
 }
