@@ -67,38 +67,35 @@ public class PortfolioManagerImpl implements PortfolioManager {
   //  Remember to fill out the buildUri function and use that.
 
 
-  // public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
-  //     throws JsonProcessingException {
-  //     String url= buildUri(symbol, from, to);
-  //     System.out.println("Generated URL: " + url); 
-  //    return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
-    
-  // }
   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
       throws JsonProcessingException {
-    String url = "https://api.tiingo.com/tiingo/daily/AAPL/prices?startDate=2020-01-01&endDate=2020-12-31&token=1106a1a3940ab609f2cac6fc9630caee9c6dfc58";
-    URI uri;
-    try {
-        uri = new URI(url);
-        System.out.println("URI: " + uri.toString());
-    } catch (URISyntaxException e) {
-        e.printStackTrace();
-        throw new RuntimeException("Invalid URL", e);
-    }
-    return Arrays.asList(restTemplate.getForObject(uri, TiingoCandle[].class));
-}
+      String url= buildUri(symbol, from, to);
+     // System.out.println("Generated URL: " + url); 
+     return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+    
+  }
+//   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
+//       throws JsonProcessingException {
+//     String url = "https://api.tiingo.com/tiingo/daily/AAPL/prices?startDate=2020-01-01&endDate=2020-12-31&token=1106a1a3940ab609f2cac6fc9630caee9c6dfc58";
+//     URI uri;
+//     try {
+//         uri = new URI(url);
+//         System.out.println("URI: " + uri.toString());
+//     } catch (URISyntaxException e) {
+//         e.printStackTrace();
+//         throw new RuntimeException("Invalid URL", e);
+//     }
+//     return Arrays.asList(restTemplate.getForObject(uri, TiingoCandle[].class));
+// }
 
 
 
-//   protected String buildUri(String symbol, LocalDate startDate, LocalDate endDate) {
-//     //  String uriTemplate = "https://api.tiingo.com/tiingo/daily/"+symbol+"/prices?"
-//     //         + "startDate="+startDate+"&endDate="+endDate+"&token="+PortfolioManagerApplication.getToken();
-//     //         return uriTemplate;
-  
-//     String uriTemplate = "https://api.tiingo.com/tiingo/daily/" + symbol + "/prices?"
-//     + "startDate=" + startDate + "&endDate=" + endDate + "&token=" + PortfolioManagerApplication.getToken();
-// return uriTemplate;
-//   }
+  protected String buildUri(String symbol, LocalDate startDate, LocalDate endDate) {
+
+    String uriTemplate = "https://api.tiingo.com/tiingo/daily/" + symbol + "/prices?"
+    + "startDate=" + startDate + "&endDate=" + endDate + "&token=" + PortfolioManagerApplication.getToken();
+return uriTemplate;
+  }
 // protected String buildUri(String symbol, LocalDate startDate, LocalDate endDate) {
 //   return UriComponentsBuilder.fromHttpUrl("https://api.tiingo.com/tiingo/daily/" + symbol + "/prices")
 //           .queryParam("startDate", startDate)
