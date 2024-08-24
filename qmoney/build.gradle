@@ -7,6 +7,9 @@ group = 'com.crio.warmup'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+
+
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -48,6 +51,15 @@ test {
 
 publishing {
     publications {
+        maven(MavenPublication){
+        groupId =  'com.crio.warmup'
+
+artifactId = 'annual-return'
+
+version = '1.0.0'
+
+from components.java
+        }
     }
 }
 
