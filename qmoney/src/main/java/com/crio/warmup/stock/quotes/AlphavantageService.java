@@ -6,6 +6,10 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import com.crio.warmup.stock.dto.AlphavantageCandle;
 import com.crio.warmup.stock.dto.AlphavantageDailyResponse;
 import com.crio.warmup.stock.dto.Candle;
+
+import com.crio.warmup.stock.dto.AlphavantageDailyResponse;
+import com.crio.warmup.stock.dto.Candle;
+import com.crio.warmup.stock.exception.StockQuoteServiceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -98,5 +102,12 @@ private String buildUri(String symbol) {
   //     be using configurations provided in the {@link @application.properties}.
   //  2. Use this method in #getStockQuote.
 
-}
+   // TODO: CRIO_TASK_MODULE_EXCEPTIONS
+  //   1. Update the method signature to match the signature change in the interface.
+  //   2. Start throwing new StockQuoteServiceException when you get some invalid response from
+  //      Alphavantage, or you encounter a runtime exception during Json parsing.
+  //   3. Make sure that the exception propagates all the way from PortfolioManager, so that the
+  //      external user's of our API are able to explicitly handle this exception upfront.
+  //CHECKSTYLE:OFF
 
+}
