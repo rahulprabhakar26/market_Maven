@@ -10,6 +10,9 @@ public enum StockQuoteServiceFactory {
   // https://softwareengineering.stackexchange.com/q/179386/253205
 
   INSTANCE;
+    
+ 
+
 
   // TODO: CRIO_TASK_MODULE_ADDITIONAL_REFACTOR
   //  Make sure that you have implemented TiingoService and AlphavantageService
@@ -23,7 +26,17 @@ public enum StockQuoteServiceFactory {
   //  ./gradlew test --tests StockQuoteServiceFactory
 
   public StockQuotesService getService(String provider,  RestTemplate restTemplate) {
-
-     return null;
+    StockQuotesService sqt;
+    if(provider==null) sqt = new AlphavantageService(restTemplate);
+    else if(provider.equalsIgnoreCase("tiingo"))sqt=new TiingoService(restTemplate);
+    else sqt=new AlphavantageService(restTemplate); 
+     return sqt;
   }
 }
+//this is the aletnate of the above enum implemetation.
+// public final class StockQuoteServiceFactory{
+//   public final static StockQuoteServiceFactory INSTANCE = new StockQuoteServiceFactory();
+//   private StockQuoteServiceFactory(){
+    
+//   }
+// }

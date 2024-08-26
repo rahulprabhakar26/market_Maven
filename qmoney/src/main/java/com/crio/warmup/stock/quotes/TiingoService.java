@@ -1,6 +1,7 @@
 
 package com.crio.warmup.stock.quotes;
 
+import com.crio.warmup.stock.PortfolioManagerApplication;
 import com.crio.warmup.stock.dto.Candle;
 import com.crio.warmup.stock.dto.TiingoCandle;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,8 +15,33 @@ import org.springframework.web.client.RestTemplate;
 public class TiingoService implements StockQuotesService {
 
 
-  protected TiingoService(RestTemplate restTemplate) {
-    this.restTemplate = restTemplate;
+  private RestTemplate restTemplate;
+
+  public TiingoService(RestTemplate restTemplate) {
+	this.restTemplate = restTemplate;
+}
+
+@Override
+  public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
+      throws JsonProcessingException {
+      ObjectMapper om=new ObjectMapper();
+      om.registerModule(new JavaTimeModule());
+      String url= buildUri(symbol, from, to);
+     // System.out.println("Generated URL: " + url); 
+    //  return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+    String candles = restTemplate.getForObject(url, String.class);
+    List<Candle> lst=Arrays.asList(om.readValue(candles, TiingoCandle[].class));
+
+    return lst;
+
+    
+  }
+
+  protected String buildUri(String symbol, LocalDate startDate, LocalDate endDate) {
+
+    String uriTemplate = "https://api.tiingo.com/tiingo/daily/" + symbol + "/prices?"
+    + "startDate=" + startDate + "&endDate=" + endDate + "&token=" + PortfolioManagerApplication.getToken();
+return uriTemplate;
   }
 
 

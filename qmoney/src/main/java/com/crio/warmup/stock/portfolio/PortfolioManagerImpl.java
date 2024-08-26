@@ -34,10 +34,23 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class PortfolioManagerImpl implements PortfolioManager {
 
  private RestTemplate restTemplate ;
+ 
+ private StockQuotesService stockQuotesService;
+
+ protected PortfolioManagerImpl(StockQuotesService stockQuotesService) {
+  this.stockQuotesService= stockQuotesService;
+}
+
+
+// public List<Candle> getStockQuote(String symbol, LocalDate startLocalDate, LocalDate endLocalDate)
+//       throws JsonProcessingException {
+//         return stockQuotesService.getStockQuote(symbol, startLocalDate, endLocalDate);
+//       }
   // Caution: Do not delete or modify the constructor, or else your build will break!
   // This is absolutely necessary for backward compatibility
   protected PortfolioManagerImpl(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
+   // this.stockQuotesService= stockQuotesService;
   }
 
 
@@ -70,9 +83,11 @@ public class PortfolioManagerImpl implements PortfolioManager {
 
   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
       throws JsonProcessingException {
-      String url= buildUri(symbol, from, to);
-     // System.out.println("Generated URL: " + url); 
-     return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+    //   String url= buildUri(symbol, from, to);
+    //  // System.out.println("Generated URL: " + url); 
+    //  return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+
+    return stockQuotesService.getStockQuote(symbol, from, to);
     
   }
 //   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)

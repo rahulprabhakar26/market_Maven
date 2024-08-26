@@ -3,19 +3,72 @@ package com.crio.warmup.stock.quotes;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
-
+import com.crio.warmup.stock.dto.AlphavantageCandle;
 import com.crio.warmup.stock.dto.AlphavantageDailyResponse;
 import com.crio.warmup.stock.dto.Candle;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+// import org.springframework.http.codec.multipart.MultipartParser.Token;
 import org.springframework.web.client.RestTemplate;
 
 public class AlphavantageService implements StockQuotesService {
+  
+  public static final String TOKEN = "FMAARF12NJ882ES5";
+  public static final String FUNCTION = "TIME_SERIES_DAILY";
+  
+  private RestTemplate restTemplate;
+
+  public AlphavantageService(RestTemplate restTemplate) {
+	this.restTemplate = restTemplate;
+}
+
+
+  @Override
+  public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
+      throws JsonProcessingException {
+        ObjectMapper om=new ObjectMapper();
+        om.registerModule(new JavaTimeModule());
+        String url= buildUri(symbol);
+     List<Candle> lst=new ArrayList<>();
+      // System.out.println("Generated URL: " + url); 
+      //  return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+      String apiMapResponse = restTemplate.getForObject(url, String.class);
+
+      Map<LocalDate, AlphavantageCandle> responseMap= om.readValue(apiMapResponse, AlphavantageDailyResponse.class).getCandles();
+
+      for (LocalDate date =from; !date.isAfter(to); date = date.plusDays(1)) {
+         AlphavantageCandle candle = responseMap.get(date);
+
+         if(candle !=null){
+          candle.setDate(date);
+          lst.add(candle);
+         }
+      }
+
+
+      // List<AlphavantageDailyResponse> lst=Arrays.asList(om.readValue(candles, AlphavantageDailyResponse[].class));
+  
+      // for (AlphavantageDailyResponse alphavantageDailyResponse : lst) {
+        
+      // }
+      return lst;
+  
+  }
+
+private String buildUri(String symbol) {
+  // String uriTemplate=String.format("https://www.alphavantage.co/query?function=%s&symbol=%s&apikey=%s", FUNCTION, symbol, TOKEN);
+
+   String uriT= "https://www.alphavantage.co/query?function="+FUNCTION+"&symbol="+symbol+"&apikey="+TOKEN;
+	return uriT ;
+}
+//https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AAPL&output=full&apikey=FMAARF12NJ882ES5
+//FMAARF12NJ882ES5
 
   // TODO: CRIO_TASK_MODULE_ADDITIONAL_REFACTOR
   //  Implement the StockQuoteService interface as per the contracts. Call Alphavantage service
