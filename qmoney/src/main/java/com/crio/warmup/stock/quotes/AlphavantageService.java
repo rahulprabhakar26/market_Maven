@@ -35,13 +35,14 @@ public class AlphavantageService implements StockQuotesService {
 
   @Override
   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
-      throws JsonProcessingException {
+      throws JsonProcessingException, StockQuoteServiceException {
         ObjectMapper om=new ObjectMapper();
         om.registerModule(new JavaTimeModule());
         String url= buildUri(symbol);
      List<Candle> lst=new ArrayList<>();
       // System.out.println("Generated URL: " + url); 
       //  return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+      try{
       String apiMapResponse = restTemplate.getForObject(url, String.class);
 
       Map<LocalDate, AlphavantageCandle> responseMap= om.readValue(apiMapResponse, AlphavantageDailyResponse.class).getCandles();
@@ -53,6 +54,9 @@ public class AlphavantageService implements StockQuotesService {
           candle.setDate(date);
           lst.add(candle);
          }
+        }
+      }catch(NullPointerException e){
+        throw new StockQuoteServiceException("Alphavantage returned invalid response",e);
       }
 
 

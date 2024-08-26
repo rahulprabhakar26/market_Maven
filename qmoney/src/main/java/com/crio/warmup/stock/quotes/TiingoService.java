@@ -26,15 +26,19 @@ public class TiingoService implements StockQuotesService {
 
 @Override
   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
-      throws JsonProcessingException {
+      throws JsonProcessingException, StockQuoteServiceException {
       ObjectMapper om=new ObjectMapper();
       om.registerModule(new JavaTimeModule());
       String url= buildUri(symbol, from, to);
      // System.out.println("Generated URL: " + url); 
     //  return Arrays.asList(restTemplate.getForObject(url, TiingoCandle[].class));
+    List<Candle> lst;
+    try{
     String candles = restTemplate.getForObject(url, String.class);
-    List<Candle> lst=Arrays.asList(om.readValue(candles, TiingoCandle[].class));
-
+     lst=Arrays.asList(om.readValue(candles, TiingoCandle[].class));
+    }catch(NullPointerException e){
+      throw new StockQuoteServiceException("Error occured when requesting response from tiingo API", e.getCause());
+    }
     return lst;
 
     
